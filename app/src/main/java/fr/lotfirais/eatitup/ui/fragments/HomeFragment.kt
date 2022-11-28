@@ -15,21 +15,29 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 
 class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        val compositeDisposable = CompositeDisposable()
         compositeDisposable.add(
-            ServiceBuilder.buildService().getMealById("52772")
+            ServiceBuilder.buildService()
+                .getMealById("52772")
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({response -> onResponse(response)}, {t -> onFailure(t) }))
 
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        compositeDisposable.clear()
     }
 
     private fun onFailure(t: Throwable) {
