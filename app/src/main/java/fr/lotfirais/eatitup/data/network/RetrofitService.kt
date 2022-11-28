@@ -17,6 +17,9 @@ interface RetrofitService {
     @GET("random.php")
     fun getRandomMeal(): Single<Meals>
 
-    @GET("https://www.themealdb.com/api/json/v1/1/lookup.php?i=")
+    @GET("lookup.php?i=")
     fun getMealById(@Query("i")id:String): Single<Meals>
+
+    @GET("search.php?s=")
+    fun searchMealByName(@Query("s")search:String): Single<Meals>
 }
