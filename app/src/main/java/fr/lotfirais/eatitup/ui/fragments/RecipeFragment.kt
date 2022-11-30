@@ -1,4 +1,7 @@
 package fr.lotfirais.eatitup.ui.fragments
 
-class RecipeFragment {
+import androidx.fragment.app.Fragment
+
+class RecipeFragment : Fragment() {
+
 }
