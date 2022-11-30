@@ -7,4 +7,6 @@
     <string name="try_random_meal_button_text">Try it !</string>
     <string name="search_button_text">Search</string>
     <string name="meal_thumbnail">Meal thumbnail</string>
+    <string name="ingredientsTitle">Ingredients</string>
+    <string name="instructionsTitle">Steps</string>
 </resources>

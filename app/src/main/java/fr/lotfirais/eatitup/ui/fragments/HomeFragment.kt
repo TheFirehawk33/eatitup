@@ -10,8 +10,8 @@ import androidx.navigation.fragment.findNavController
 import fr.lotfirais.eatitup.data.models.Meals
 import fr.lotfirais.eatitup.data.network.ServiceBuilder
 import fr.lotfirais.eatitup.databinding.FragmentHomeBinding
-import fr.lotfirais.eatitup.utils.ImageDisplay
 import fr.lotfirais.eatitup.utils.Common
+import fr.lotfirais.eatitup.utils.ImageDisplay
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -23,6 +23,7 @@ class HomeFragment : Fragment() {
 
     private var searchMode : Int = 0
     private var searchText : String = ""
+    private var randomMealId : String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,24 +32,23 @@ class HomeFragment : Fragment() {
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-        binding.buttonByName.setOnClickListener{
-            searchMode = 0
-        }
-        binding.buttonByIngredient.setOnClickListener{
-            searchMode = 1
-        }
+        randomMealRequest()
 
-        binding.searchText.doOnTextChanged { text, _, _, _ ->
-            searchText = text.toString()
-        }
+        binding.buttonByName.setOnClickListener{ searchMode = 0 }
+        binding.buttonByIngredient.setOnClickListener{ searchMode = 1 }
 
+        binding.searchText.doOnTextChanged { text, _, _, _ -> searchText = text.toString() }
+
+        binding.buttonTryRandomMeal.setOnClickListener{
+            findNavController().navigate(
+                HomeFragmentDirections.actionHomeFragmentToRecipeFragment(randomMealId)
+            )
+        }
         binding.searchButton.setOnClickListener{
             findNavController().navigate(
                 HomeFragmentDirections.actionHomeFragmentToSearchFragment(searchText, searchMode)
             )
         }
-
-        randomRequest()
 
         return binding.root
     }
@@ -59,7 +59,7 @@ class HomeFragment : Fragment() {
         compositeDisposable.clear()
     }
 
-    private fun randomRequest() {
+    private fun randomMealRequest() {
         compositeDisposable.add(
             ServiceBuilder.buildService()
                 .getRandomMeal()
@@ -69,10 +69,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun onRandomResponse(response: Meals) {
-        response.meals?.first()?.strMealThumb?.let { imageUrl ->
-            ImageDisplay.loadImageViaUrl(requireContext(), binding.randomMealImage, imageUrl, ImageDisplay.homeImageOptions)
-
+        response.meals?.first()?.let { meal ->
             binding.randomMealText.text = response.meals?.first()?.strMeal
+
+            if(meal.strMealThumb != null) ImageDisplay.loadImageViaUrl(requireContext(), binding.randomMealImage, meal.strMealThumb, ImageDisplay.homeImageOptions)
+            randomMealId = response.meals?.first()?.idMeal!!
         }
     }
 }
