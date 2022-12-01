@@ -1,7 +1,6 @@
 package fr.lotfirais.eatitup.ui.fragments
 
 import android.os.Bundle
-import android.os.Debug
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,6 @@ import android.widget.ArrayAdapter
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import fr.lotfirais.eatitup.R
 import fr.lotfirais.eatitup.data.models.Ingredients
 import fr.lotfirais.eatitup.data.models.Meals
 import fr.lotfirais.eatitup.data.network.ServiceBuilder
@@ -20,7 +18,6 @@ import fr.lotfirais.eatitup.utils.ImageDisplay
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import java.util.logging.Logger
 
 
 class HomeFragment : Fragment() {
@@ -42,8 +39,15 @@ class HomeFragment : Fragment() {
         getAutocompleteData()
         randomMealRequest()
 
-        binding.buttonByName.setOnClickListener { searchMode = 0 }
-        binding.buttonByIngredient.setOnClickListener { searchMode = 1 }
+        binding.buttonByName.setOnClickListener {
+            searchMode = 0
+            binding.searchText.setAdapter(null)
+        }
+        binding.buttonByIngredient.setOnClickListener {
+            searchMode = 1
+            val autocompleteAdapter = AutocompleteArrayAdapter(5)
+            binding.searchText.setAdapter(autocompleteAdapter)
+        }
 
         binding.searchText.doOnTextChanged { text, _, _, _ -> searchText = text.toString() }
         binding.searchText.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
@@ -113,17 +117,21 @@ class HomeFragment : Fragment() {
     }
 
     private fun fillAutocompleteData(response: Ingredients) {
-        response.ingredients?.forEach {
+        response.meals?.forEach {
             if (!it.strIngredient.isNullOrEmpty())
                 autocompleteData.add(it.strIngredient)
         }
+    }
 
-        val autocompleteAdapter: ArrayAdapter<String> = ArrayAdapter<String>(
-            requireContext(),
-            R.layout.item_autocomplete,
-            autocompleteData
-        )
-        binding.searchText.setAdapter(autocompleteAdapter)
-
+    inner class AutocompleteArrayAdapter(private val proposedChoices: Int) : ArrayAdapter<String>(
+        requireContext(),
+        android.R.layout.simple_list_item_1,
+        autocompleteData
+    ) {
+        override fun getCount(): Int {
+            if(super.getCount() > proposedChoices)
+                return proposedChoices
+            return super.getCount()
+        }
     }
 }
