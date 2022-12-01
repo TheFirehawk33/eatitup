@@ -1,6 +1,7 @@
 package fr.lotfirais.eatitup.data.network
 
 import fr.lotfirais.eatitup.data.models.CategoryList
+import fr.lotfirais.eatitup.data.models.Ingredients
 import fr.lotfirais.eatitup.data.models.Meals
 import io.reactivex.rxjava3.core.Single
 import retrofit2.http.GET
@@ -21,4 +22,10 @@ interface RetrofitService {
 
     @GET("search.php?s=")
     fun searchMealByName(@Query("s")search:String): Single<Meals>
+
+    @GET("filter.php?i=")
+    fun searchMealByIngredient(@Query("i")search:String): Single<Meals>
+
+    @GET("list.php?i=list")
+    fun getAllIngredients():Single<Ingredients>
 }
