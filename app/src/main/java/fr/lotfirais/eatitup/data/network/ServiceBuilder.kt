@@ -1,6 +1,6 @@
 package fr.lotfirais.eatitup.data.network
 
-import fr.lotfirais.eatitup.common.BASE_URL
+import fr.lotfirais.eatitup.utils.BASE_URL
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory

@@ -1,3 +1,12 @@
 <resources>
-    <string name="app_name">EatItUp</string>
+    <string name="app_name">EatItUp!</string>
+    <string name="search_by_name_text">by name</string>
+    <string name="search_by_ingredient_text">by ingredient</string>
+    <string name="search_for_a_recipe_text">Search for a recipe</string>
+    <string name="random_recipe_of_the_moment_text">Random recipe of the moment !</string>
+    <string name="try_random_meal_button_text">Try it !</string>
+    <string name="search_button_text">Search</string>
+    <string name="meal_thumbnail">Meal thumbnail</string>
+    <string name="ingredientsTitle">Ingredients</string>
+    <string name="instructionsTitle">Steps</string>
 </resources>

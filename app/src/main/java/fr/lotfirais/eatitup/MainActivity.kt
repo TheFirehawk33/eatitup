@@ -1,15 +1,11 @@
 package fr.lotfirais.eatitup
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 import android.os.Bundle
-import android.widget.Toast
-import fr.lotfirais.eatitup.data.models.Meals
-import fr.lotfirais.eatitup.data.network.ServiceBuilder
+import android.view.View
+import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AppCompatActivity
 import fr.lotfirais.eatitup.databinding.ActivityMainBinding
-import fr.lotfirais.eatitup.ui.fragments.HomeFragment
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.disposables.CompositeDisposable
-import io.reactivex.rxjava3.schedulers.Schedulers
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -18,10 +14,20 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        hideKeyBoardOnTouchOn(binding.root)
+    }
 
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.fragmentContainerView, HomeFragment())
-            .commit()
+    /**
+     * Hides keyboard on touch
+     * @param v to hide keyboard onclick on
+     */
+    private fun hideKeyBoardOnTouchOn(v: View) {
+        v.setOnTouchListener { view: View, _ ->
+            val imm = view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(view.windowToken, 0)
+            v.requestFocus()
+            v.performClick()
+            false
+        }
     }
 }
