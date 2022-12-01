@@ -21,4 +21,7 @@ interface RetrofitService {
 
     @GET("search.php?s=")
     fun searchMealByName(@Query("s")search:String): Single<Meals>
+
+    @GET("filter.php?i=")
+    fun searchMealByIngredient(@Query("i")search:String): Single<Meals>
 }

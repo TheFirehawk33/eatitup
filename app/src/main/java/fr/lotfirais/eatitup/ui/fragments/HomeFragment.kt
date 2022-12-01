@@ -1,6 +1,7 @@
 package fr.lotfirais.eatitup.ui.fragments
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,6 +39,13 @@ class HomeFragment : Fragment() {
         binding.buttonByIngredient.setOnClickListener{ searchMode = 1 }
 
         binding.searchText.doOnTextChanged { text, _, _, _ -> searchText = text.toString() }
+        binding.searchText.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                binding.searchButton.performClick()
+                return@OnKeyListener true
+            }
+            false
+        })
 
         binding.buttonTryRandomMeal.setOnClickListener{
             findNavController().navigate(

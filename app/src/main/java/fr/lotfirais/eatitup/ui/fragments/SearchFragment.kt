@@ -38,7 +38,11 @@ class SearchFragment : Fragment() {
         binding.recyclerViewMeals.adapter = ResultsAdapter(requireContext())
 
         searchString?.let {
-            searchRequest(it)
+            if(searchMode == 0) {
+                searchByNameRequest(it)
+            } else {
+                searchByIngredientRequest(it)
+            }
         }
 
         return binding.root
@@ -50,10 +54,19 @@ class SearchFragment : Fragment() {
         compositeDisposable.clear()
     }
 
-    private fun searchRequest(text: String) {
+    private fun searchByNameRequest(text: String) {
         compositeDisposable.add(
             ServiceBuilder.buildService()
                 .searchMealByName(text)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({response -> onSearchResponse(response)}, {t -> Common.onFailure(requireContext(), t) }))
+    }
+
+    private fun searchByIngredientRequest(text: String) {
+        compositeDisposable.add(
+            ServiceBuilder.buildService()
+                .searchMealByIngredient(text)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe({response -> onSearchResponse(response)}, {t -> Common.onFailure(requireContext(), t) }))
