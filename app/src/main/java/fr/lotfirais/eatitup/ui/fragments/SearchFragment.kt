@@ -36,7 +36,6 @@ class SearchFragment : Fragment() {
     ): View {
         binding = FragmentSearchBinding.inflate(inflater, container, false)
         binding.recyclerViewMeals.adapter = ResultsAdapter(requireContext())
-        binding.searchResultText.text = String.format("Search results for : \"$searchString\"")
 
         searchString?.let {
             searchRequest(it)
@@ -65,6 +64,7 @@ class SearchFragment : Fragment() {
         response.meals?.let {
             (binding.recyclerViewMeals.adapter as? ResultsAdapter)?.update(it)
 
+            binding.searchResultText.text = String.format("Search results for : \"$searchString\"")
             binding.searchResultCount.text = String.format(it.size.toString() + " results found.")
         }
     }
