@@ -19,6 +19,9 @@ object ImageDisplay {
         .centerInside()
         .transform(CircleCrop())
 
+    val recipeImageOptions : RequestOptions = RequestOptions()
+        .centerInside()
+
     fun loadImageViaUrl(context: Context, view: ImageView, url: String, options: RequestOptions) {
         Glide.with(context)
             .load(url)

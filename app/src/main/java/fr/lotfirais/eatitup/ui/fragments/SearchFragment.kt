@@ -35,7 +35,7 @@ class SearchFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSearchBinding.inflate(inflater, container, false)
-        binding.recyclerView.adapter = ResultsAdapter(requireContext())
+        binding.recyclerViewMeals.adapter = ResultsAdapter(requireContext())
         binding.searchResultText.text = String.format("Search results for : \"$searchString\"")
 
         searchString?.let {
@@ -43,6 +43,12 @@ class SearchFragment : Fragment() {
         }
 
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        compositeDisposable.clear()
     }
 
     private fun searchRequest(text: String) {
@@ -57,7 +63,7 @@ class SearchFragment : Fragment() {
     private fun onSearchResponse(response: Meals) {
         binding.searchResultCount.text = String.format("No results found.")
         response.meals?.let {
-            (binding.recyclerView.adapter as? ResultsAdapter)?.update(it)
+            (binding.recyclerViewMeals.adapter as? ResultsAdapter)?.update(it)
 
             binding.searchResultCount.text = String.format(it.size.toString() + " results found.")
         }

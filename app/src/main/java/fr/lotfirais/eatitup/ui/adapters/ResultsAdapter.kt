@@ -2,10 +2,14 @@ package fr.lotfirais.eatitup.ui.adapters
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
+import fr.lotfirais.eatitup.R
 import fr.lotfirais.eatitup.data.models.Meal
 import fr.lotfirais.eatitup.databinding.ItemResultBinding
 import fr.lotfirais.eatitup.utils.ImageDisplay
@@ -35,8 +39,22 @@ class ResultsAdapter(
         notifyDataSetChanged()
     }
 
-    inner class ResultsViewHolder(noteView: View) : RecyclerView.ViewHolder(noteView) {
-        private val binding: ItemResultBinding = ItemResultBinding.bind(noteView)
+    inner class ResultsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val binding: ItemResultBinding = ItemResultBinding.bind(view)
+        private var navController: NavController? = null
+        private var bundle: Bundle = Bundle()
+
+        init {
+            binding.recipeItem.setOnClickListener{
+                items[adapterPosition].idMeal?.let{
+                    navController = Navigation.findNavController(view)
+                    bundle.putString("recipeId", it)
+
+                    navController!!.navigate(R.id.action_searchFragment_to_recipeFragment, bundle)
+                    //SearchFragmentDirections.actionSearchFragmentToRecipeFragment(it)
+                }
+            }
+        }
 
         fun bind(meal: Meal) {
             binding.run {
@@ -46,7 +64,7 @@ class ResultsAdapter(
                 meal.strMealThumb?.let { ImageDisplay.loadImageViaUrl(
                     context,
                     mealThumb,
-                    "$it/preview",
+                    it,
                     ImageDisplay.thumbResultsOptions)
                 }
             }
