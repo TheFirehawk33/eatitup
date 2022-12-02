@@ -136,6 +136,7 @@ class HomeFragment : Fragment() {
                 HomeFragmentDirections.actionHomeFragmentToSearchFragment(searchText, searchMode)
             )
         }
+
     }
 
     private fun getAutocompleteIngredientsData() {
