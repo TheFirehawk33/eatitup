@@ -15,6 +15,8 @@ import fr.lotfirais.eatitup.data.network.ServiceBuilder
 import fr.lotfirais.eatitup.databinding.FragmentHomeBinding
 import fr.lotfirais.eatitup.utils.Common
 import fr.lotfirais.eatitup.utils.ImageDisplay
+import fr.lotfirais.eatitup.utils.SEARCH_BY_INGREDIENTS_ID
+import fr.lotfirais.eatitup.utils.SEARCH_BY_NAME_ID
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -28,8 +30,6 @@ class HomeFragment : Fragment() {
     private var searchText: String = ""
     private var randomMealId: String = ""
 
-    private val searchByNameId = 0;
-    private val searchByIngredientId = 1;
     private val proposedChoices = 5;
     private var autocompleteIngredientData: MutableList<String> = mutableListOf()
     private var autocompleteMealsData: MutableList<String> = mutableListOf()
@@ -92,19 +92,19 @@ class HomeFragment : Fragment() {
 
     private fun initListener() {
         binding.buttonByName.setOnClickListener {
-            searchMode = searchByNameId
+            searchMode = SEARCH_BY_NAME_ID
             binding.searchText.text.clear()
             binding.searchText.setAdapter(autocompleteMealsArrayAdapter)
         }
         binding.buttonByIngredient.setOnClickListener {
-            searchMode = searchByIngredientId
+            searchMode = SEARCH_BY_INGREDIENTS_ID
             binding.searchText.text.clear()
             binding.searchText.setAdapter(autocompleteIngredientsArrayAdapter)
         }
 
         binding.searchText.doOnTextChanged { text, _, _, _ ->
 
-            if (text.toString().isNotEmpty() && searchMode == searchByNameId) {
+            if (text.toString().isNotEmpty() && searchMode == SEARCH_BY_NAME_ID) {
                 searchText = text.toString()
                 getAutocompleteMealsData(text.toString())
             }
