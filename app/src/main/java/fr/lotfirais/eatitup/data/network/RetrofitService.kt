@@ -28,4 +28,5 @@ interface RetrofitService {
 
     @GET("list.php?i=list")
     fun getAllIngredients():Single<Ingredients>
+
 }
