@@ -39,6 +39,14 @@ class HomeFragment : Fragment() {
 
         binding.searchText.doOnTextChanged { text, _, _, _ -> searchText = text.toString() }
 
+        binding.buttonRandomizer.setOnClickListener{
+            randomMealRequest()
+        }
+        binding.randomMealImage.setOnClickListener{
+            findNavController().navigate(
+                HomeFragmentDirections.actionHomeFragmentToRecipeFragment(randomMealId)
+            )
+        }
         binding.buttonTryRandomMeal.setOnClickListener{
             findNavController().navigate(
                 HomeFragmentDirections.actionHomeFragmentToRecipeFragment(randomMealId)

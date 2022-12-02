@@ -5,6 +5,7 @@ import android.widget.Toast
 import fr.lotfirais.eatitup.data.models.IngredientsHolder
 import fr.lotfirais.eatitup.data.models.Meal
 
+
 object Common {
     fun onFailure(context: Context, t: Throwable) {
         Toast.makeText(context,t.message, Toast.LENGTH_SHORT).show()
