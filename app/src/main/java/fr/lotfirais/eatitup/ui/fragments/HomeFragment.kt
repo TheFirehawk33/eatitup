@@ -28,6 +28,7 @@ class HomeFragment : Fragment() {
     private var searchText: String = ""
     private var randomMealId: String = ""
 
+    private val proposedChoices = 5;
     private var autocompleteIngredientData: MutableList<String> = mutableListOf()
     private var autocompleteMealsData: MutableList<String> = mutableListOf()
     private lateinit var autocompleteMealsArrayAdapter : ArrayAdapter<String>
@@ -82,8 +83,8 @@ class HomeFragment : Fragment() {
     {
         getAutocompleteIngredientsData()
         randomMealRequest()
-        autocompleteMealsArrayAdapter = AutocompleteArrayAdapter(5,autocompleteMealsData)
-        autocompleteIngredientsArrayAdapter = AutocompleteArrayAdapter(5,autocompleteIngredientData)
+        autocompleteMealsArrayAdapter = AutocompleteArrayAdapter(autocompleteMealsData)
+        autocompleteIngredientsArrayAdapter = AutocompleteArrayAdapter(autocompleteIngredientData)
 
         binding.searchText.setAdapter(autocompleteMealsArrayAdapter)
     }
@@ -166,10 +167,10 @@ class HomeFragment : Fragment() {
             if (!it.strMeal.isNullOrEmpty() && it.strMeal.uppercase().contains(wholeWord.uppercase()))
                 autocompleteMealsData.add(it.strMeal)
         }
-        binding.searchText.setAdapter( AutocompleteArrayAdapter(5,autocompleteMealsData))
+        binding.searchText.setAdapter( AutocompleteArrayAdapter(autocompleteMealsData))
     }
 
-    inner class AutocompleteArrayAdapter(private val proposedChoices: Int, private val autocompleteData:MutableList<String>) : ArrayAdapter<String>(
+    inner class AutocompleteArrayAdapter(private val autocompleteData:MutableList<String>) : ArrayAdapter<String>(
         requireContext(),
         android.R.layout.simple_list_item_1,
         autocompleteData
