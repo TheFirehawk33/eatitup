@@ -10,4 +10,6 @@
     <string name="ingredientsTitle">Ingredients</string>
     <string name="instructionsTitle">Steps</string>
     <string name="share_button">Share</string>
+    <string name="button_randomize_text">Randomize</string>
+    <string name="randomizer_text">To get another random recipe, press the button above or shake your phone !</string>
 </resources>

@@ -25,9 +25,9 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private val compositeDisposable = CompositeDisposable()
 
-    private var searchMode: Int = 0
-    private var searchText: String = ""
-    private var randomMealId: String = ""
+    private var searchMode : Int = 0
+    private var searchText : String = ""
+    private var randomMealId : String = ""
 
     private val proposedChoices = 5;
     private var autocompleteIngredientData: MutableList<String> = mutableListOf()
@@ -119,6 +119,14 @@ class HomeFragment : Fragment() {
             false
         })
 
+        binding.buttonRandomizer.setOnClickListener{
+            randomMealRequest()
+        }
+        binding.randomMealImage.setOnClickListener{
+            findNavController().navigate(
+                HomeFragmentDirections.actionHomeFragmentToRecipeFragment(randomMealId)
+            )
+        }
         binding.buttonTryRandomMeal.setOnClickListener {
             findNavController().navigate(
                 HomeFragmentDirections.actionHomeFragmentToRecipeFragment(randomMealId)
