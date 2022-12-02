@@ -129,9 +129,10 @@ class HomeFragment : Fragment() {
 
         binding.searchText.doOnTextChanged { text, _, _, _ ->
 
-            if (text.toString().isNotEmpty() && searchMode == SEARCH_BY_NAME_ID) {
+            if (text.toString().isNotEmpty()) {
                 searchText = text.toString()
-                getAutocompleteMealsData(text.toString())
+                if (searchMode == SEARCH_BY_NAME_ID)
+                    getAutocompleteMealsData(text.toString())
             }
 
         }
