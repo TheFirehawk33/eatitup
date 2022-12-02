@@ -29,6 +29,4 @@ interface RetrofitService {
     @GET("list.php?i=list")
     fun getAllIngredients():Single<Ingredients>
 
-    @GET("search.php?f=")
-    fun searchMealByFirstLetter(@Query("f")firstLetter:String): Single<Meals>
 }

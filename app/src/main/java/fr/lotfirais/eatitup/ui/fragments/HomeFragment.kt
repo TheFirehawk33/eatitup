@@ -106,7 +106,7 @@ class HomeFragment : Fragment() {
             if(text.toString().isNotEmpty())
             {
                 searchText = text.toString()
-                getAutocompleteMealsData(text.toString().substring(0,1), text.toString())
+                getAutocompleteMealsData(text.toString())
             }
 
         }
@@ -149,22 +149,22 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun getAutocompleteMealsData(firstLetter: String, wholeWord: String) {
+    private fun getAutocompleteMealsData( wholeWord: String) {
         compositeDisposable.add(
             ServiceBuilder.buildService()
-                .searchMealByFirstLetter(firstLetter)
+                .searchMealByName(wholeWord)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
-                    { response -> fillAutocompleteMealsData(response, wholeWord) },
+                    { response -> fillAutocompleteMealsData(response) },
                     { t -> Common.onFailure(requireContext(), t) })
         )
     }
 
-    private fun fillAutocompleteMealsData(response: Meals, wholeWord :String) {
+    private fun fillAutocompleteMealsData(response: Meals) {
         autocompleteMealsData.clear()
         response.meals?.forEach {
-            if (!it.strMeal.isNullOrEmpty() && it.strMeal.uppercase().contains(wholeWord.uppercase()))
+            if (!it.strMeal.isNullOrEmpty() )
                 autocompleteMealsData.add(it.strMeal)
         }
         binding.searchText.setAdapter( AutocompleteArrayAdapter(autocompleteMealsData))
