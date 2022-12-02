@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
+import fr.lotfirais.eatitup.data.db.AppDAO
 import fr.lotfirais.eatitup.data.models.Meal
 import fr.lotfirais.eatitup.data.models.Meals
 import fr.lotfirais.eatitup.data.network.ServiceBuilder
@@ -30,6 +31,10 @@ class SearchFragment : Fragment() {
     private var selectedCategory: String? = ""
     private val allCategory: String = "All"
 
+    private val appDAO by lazy {
+        AppDAO(requireContext())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -45,14 +50,20 @@ class SearchFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSearchBinding.inflate(inflater, container, false)
-        binding.recyclerViewMeals.adapter = ResultsAdapter(requireContext())
+        binding.recyclerViewMeals.adapter = ResultsAdapter(requireContext()) { meal ->
+            addFavorite(meal)
+        }
 
         searchString?.let {
             if (searchMode == SEARCH_BY_NAME_ID) {
-                binding.recyclerViewMeals.adapter = ResultsAdapter(requireContext())
+                binding.recyclerViewMeals.adapter = ResultsAdapter(requireContext()){ meal ->
+                    addFavorite(meal)
+                }
                 searchByNameRequest(it)
             } else {
-                binding.recyclerViewMeals.adapter = ResultsAlternateAdapter(requireContext())
+                binding.recyclerViewMeals.adapter = ResultsAlternateAdapter(requireContext()) { meal ->
+                    addFavorite(meal)
+                }
                 searchByIngredientRequest(it)
             }
         }
@@ -64,6 +75,15 @@ class SearchFragment : Fragment() {
         super.onDestroyView()
 
         compositeDisposable.clear()
+    }
+
+    private fun addFavorite(meal : Meal) {
+        compositeDisposable.add(
+            appDAO.insertFavoriteMeal(meal)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({ }, { t -> Common.onFailure(requireContext(), t) })
+        )
     }
 
     private fun searchByNameRequest(text: String) {

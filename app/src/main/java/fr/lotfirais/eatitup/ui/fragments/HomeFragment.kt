@@ -121,6 +121,11 @@ class HomeFragment : Fragment() {
         binding.buttonRandomizer.setOnClickListener {
             randomMealRequest()
         }
+        binding.buttonToFavorite.setOnClickListener {
+            findNavController().navigate(
+                HomeFragmentDirections.actionHomeFragmentToFavoriteFragment()
+            )
+        }
         binding.randomMealImage.setOnClickListener {
             findNavController().navigate(
                 HomeFragmentDirections.actionHomeFragmentToRecipeFragment(randomMealId)

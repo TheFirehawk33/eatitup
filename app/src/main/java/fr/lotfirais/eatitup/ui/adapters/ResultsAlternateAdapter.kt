@@ -16,7 +16,8 @@ import fr.lotfirais.eatitup.databinding.ItemResultBinding
 import fr.lotfirais.eatitup.utils.ImageDisplay
 
 class ResultsAlternateAdapter(
-    private val context: Context
+    private val context: Context,
+    private val onClickAddToFavorite : (Meal) -> Unit
 ) : RecyclerView.Adapter<ResultsAlternateAdapter.ResultsViewHolder>() {
 
     private val items: ArrayList<Meal> = arrayListOf()
@@ -54,6 +55,10 @@ class ResultsAlternateAdapter(
                     navController!!.navigate(R.id.action_searchFragment_to_recipeFragment, bundle)
                     //SearchFragmentDirections.actionSearchFragmentToRecipeFragment(it)
                 }
+            }
+
+            binding.buttonAddRemoveFavorite2.setOnClickListener{
+                onClickAddToFavorite(items[adapterPosition])
             }
         }
 

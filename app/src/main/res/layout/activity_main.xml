@@ -18,4 +18,5 @@
         app:navGraph="@navigation/nav_graph"
         tools:layout="@layout/fragment_home"
         />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

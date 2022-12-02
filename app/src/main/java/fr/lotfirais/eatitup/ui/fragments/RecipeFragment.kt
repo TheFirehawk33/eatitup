@@ -6,6 +6,8 @@ import android.view.*
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings.PluginState
 import androidx.fragment.app.Fragment
+import fr.lotfirais.eatitup.data.db.AppDAO
+import fr.lotfirais.eatitup.data.models.Meal
 import fr.lotfirais.eatitup.data.models.Meals
 import fr.lotfirais.eatitup.data.network.ServiceBuilder
 import fr.lotfirais.eatitup.databinding.FragmentRecipeBinding
@@ -24,6 +26,11 @@ class RecipeFragment : Fragment() {
 
     private var recipeId: String? = ""
     private var recipeName: String? = ""
+    private var mealData: Meal? = Meal()
+
+    private val appDAO by lazy {
+        AppDAO(requireContext())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +47,12 @@ class RecipeFragment : Fragment() {
     ): View {
         binding = FragmentRecipeBinding.inflate(inflater, container, false)
         binding.recyclerViewIngredients.adapter = IngredientsAdapter(requireContext())
+
+        binding.addFavButton.setOnClickListener{
+            mealData?.let{ meal ->
+                addFavorite(meal)
+            }
+        }
 
         binding.shareButton.setOnClickListener{
             val sharingIntent = Intent(Intent.ACTION_SEND)
@@ -66,6 +79,15 @@ class RecipeFragment : Fragment() {
         compositeDisposable.clear()
     }
 
+    private fun addFavorite(meal : Meal) {
+        compositeDisposable.add(
+            appDAO.insertFavoriteMeal(meal)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({ }, { t -> Common.onFailure(requireContext(), t) })
+        )
+    }
+
     private fun mealRequest(id: String) {
         compositeDisposable.add(
             ServiceBuilder.buildService()
@@ -77,9 +99,11 @@ class RecipeFragment : Fragment() {
 
     private fun onMealResponse(response: Meals) {
         response.meals?.first()?.let { meal ->
+            recipeName = meal.strMeal
+            mealData = meal
+
             (binding.recyclerViewIngredients.adapter as? IngredientsAdapter)?.update(meal)
             binding.recipeName.text = meal.strMeal
-            recipeName = meal.strMeal
             binding.categoryName.text = meal.strCategory
             binding.recipeInstructions.text = meal.strInstructions?.replace("\r","\n")
             meal.strMealThumb?.let{ thumb ->

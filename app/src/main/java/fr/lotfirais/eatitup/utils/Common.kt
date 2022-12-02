@@ -4,9 +4,13 @@ import android.content.Context
 import android.widget.Toast
 import fr.lotfirais.eatitup.data.models.IngredientsHolder
 import fr.lotfirais.eatitup.data.models.Meal
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 
 
 object Common {
+
     fun onFailure(context: Context, t: Throwable) {
         Toast.makeText(context,t.message, Toast.LENGTH_SHORT).show()
     }

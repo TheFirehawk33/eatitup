@@ -11,5 +11,7 @@
     <string name="instructionsTitle">Steps</string>
     <string name="share_button">Share</string>
     <string name="button_randomize_text">Randomize</string>
-    <string name="randomizer_text">To get another random recipe, press the button above or shake your phone !</string>
+    <string name="randomizer_text">To get another random recipe, press the button above !</string>
+    <string name="button_add_favorite">Add to favorite</string>
+    <string name="your_favorite_meals_text">Your favorite meals</string>
 </resources>
