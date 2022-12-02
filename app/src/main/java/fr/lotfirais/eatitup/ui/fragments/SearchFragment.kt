@@ -4,7 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
+import fr.lotfirais.eatitup.data.models.Meal
 import fr.lotfirais.eatitup.data.models.Meals
 import fr.lotfirais.eatitup.data.network.ServiceBuilder
 import fr.lotfirais.eatitup.databinding.FragmentSearchBinding
@@ -19,6 +22,9 @@ class SearchFragment : Fragment() {
     private val compositeDisposable = CompositeDisposable()
     private var searchString: String? = ""
     private var searchMode: Int? = 0
+    private var categoryList: MutableList<String> = mutableListOf()
+    private var selectedCategory: String? = ""
+    private val allCategory: String = "all"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +44,7 @@ class SearchFragment : Fragment() {
         binding.recyclerViewMeals.adapter = ResultsAdapter(requireContext())
 
         searchString?.let {
-            if(searchMode == 0) {
+            if (searchMode == 0) {
                 searchByNameRequest(it)
             } else {
                 searchByIngredientRequest(it)
@@ -60,7 +66,10 @@ class SearchFragment : Fragment() {
                 .searchMealByName(text)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe({response -> onSearchResponse(response)}, {t -> Common.onFailure(requireContext(), t) }))
+                .subscribe(
+                    { response -> onSearchResponse(response) },
+                    { t -> Common.onFailure(requireContext(), t) })
+        )
     }
 
     private fun searchByIngredientRequest(text: String) {
@@ -69,16 +78,64 @@ class SearchFragment : Fragment() {
                 .searchMealByIngredient(text)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe({response -> onSearchResponse(response)}, {t -> Common.onFailure(requireContext(), t) }))
+                .subscribe(
+                    { response -> onSearchResponse(response) },
+                    { t -> Common.onFailure(requireContext(), t) })
+        )
     }
 
     private fun onSearchResponse(response: Meals) {
         binding.searchResultCount.text = String.format("No results found.")
-        response.meals?.let {
-            (binding.recyclerViewMeals.adapter as? ResultsAdapter)?.update(it)
+        response.meals?.let { meals ->
+            (binding.recyclerViewMeals.adapter as? ResultsAdapter)?.update(meals)
+            fillDataPostRequest(meals)
+            initCategoryFilter(meals)
+        }
+    }
 
-            binding.searchResultText.text = String.format("Search results for : \"$searchString\"")
-            binding.searchResultCount.text = String.format(it.size.toString() + " results found.")
+    private fun fillDataPostRequest(meals: List<Meal>) {
+        binding.searchResultText.text = String.format("Search results for : \"$searchString\"")
+        binding.searchResultCount.text = String.format(meals.size.toString() + " results found.")
+        meals.forEach { meal ->
+            if (!meal.strCategory.isNullOrEmpty() && !categoryList.contains(meal.strCategory))
+                categoryList.add(meal.strCategory)
+        }
+    }
+
+    private fun initCategoryFilter(meals: List<Meal>) {
+
+
+        if (categoryList.isNotEmpty()) {
+            categoryList.add(0, allCategory)
+            binding.searchResultCategory.visibility = View.VISIBLE
+            binding.searchResultCategory.adapter =
+                ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, categoryList)
+            binding.searchResultCategory.onItemSelectedListener =
+                CategoryFilterItemSelectedListener(meals)
+
+        } else
+            binding.searchResultCategory.visibility = View.GONE
+    }
+
+    inner class CategoryFilterItemSelectedListener constructor(private val meals: List<Meal>) :
+        AdapterView.OnItemSelectedListener {
+        override fun onItemSelected(
+            parent: AdapterView<*>,
+            view: View, position: Int, id: Long
+        ) {
+            selectedCategory = categoryList[position]
+            val filteredMeals = mutableListOf<Meal>()
+
+            meals.forEach { meal ->
+                if ((!meal.strCategory.isNullOrEmpty() && meal.strCategory == selectedCategory) || selectedCategory == allCategory)
+                    filteredMeals.add(meal)
+            }
+            (binding.recyclerViewMeals.adapter as? ResultsAdapter)?.update(filteredMeals.toList())
+
+        }
+
+        override fun onNothingSelected(parent: AdapterView<*>) {
+            selectedCategory = ""
         }
     }
 }
