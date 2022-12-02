@@ -1,12 +1,15 @@
 package fr.lotfirais.eatitup.ui.fragments
 
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import fr.lotfirais.eatitup.data.models.Ingredients
 import fr.lotfirais.eatitup.data.models.Meals
 import fr.lotfirais.eatitup.data.network.ServiceBuilder
 import fr.lotfirais.eatitup.databinding.FragmentHomeBinding
@@ -63,7 +66,6 @@ class HomeFragment : Fragment() {
                 HomeFragmentDirections.actionHomeFragmentToRecipeFragment(randomMealId)
             )
         }
-        binding.buttonTryRandomMeal.setOnClickListener{
         binding.buttonTryRandomMeal.setOnClickListener {
             findNavController().navigate(
                 HomeFragmentDirections.actionHomeFragmentToRecipeFragment(randomMealId)
