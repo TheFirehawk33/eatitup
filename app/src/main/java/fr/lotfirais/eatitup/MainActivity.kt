@@ -3,7 +3,7 @@ package fr.lotfirais.eatitup
 import android.content.Context
 import android.os.Bundle
 import android.view.Menu
-import android.view.MenuItem
+import android.view.MenuInflater
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +17,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         hideKeyBoardOnTouchOn(binding.root)
+    }
+
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.menu_favorite, menu)
+        return true
     }
 
     /**
