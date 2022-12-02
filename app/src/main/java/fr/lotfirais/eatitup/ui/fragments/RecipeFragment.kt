@@ -10,6 +10,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings.PluginState
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import fr.lotfirais.eatitup.R
 import fr.lotfirais.eatitup.data.db.AppDAO
 import fr.lotfirais.eatitup.data.models.Meal
@@ -53,41 +54,18 @@ class RecipeFragment : Fragment() {
         binding = FragmentRecipeBinding.inflate(inflater, container, false)
         binding.recyclerViewIngredients.adapter = IngredientsAdapter(requireContext())
 
-        binding.addFavButton.setOnClickListener{
-            mealData?.let{ meal ->
-                addFavorite(meal)
-            }
-        }
-
-        binding.shareButton.setOnClickListener{
-            val sharingIntent = Intent(Intent.ACTION_SEND)
-
-            sharingIntent.type = "text/plain"
-            val shareBody = "$recipeName\n\nI found this recipe on the app EatItUp!\nDownload it now on Google Play Store"
-            val shareSubject = "EatItUp! recipe"
-
-            sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody)
-            sharingIntent.putExtra(Intent.EXTRA_SUBJECT, shareSubject)
-            startActivity(Intent.createChooser(sharingIntent, "Share using"))
-        }
-
         recipeId?.let{
             mealRequest(it)
         }
 
+        addButtonToActionBar(viewLifecycleOwner)
+
         return binding.root
     }
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        // The usage of an interface lets you inject your own implementation
-        val menuHost: MenuHost = requireActivity()
 
-        // Add menu items without using the Fragment Menu APIs
-        // Note how we can tie the MenuProvider to the viewLifecycleOwner
-        // and an optional Lifecycle.State (here, RESUMED) to indicate when
-        // the menu should be visible
-        menuHost.addMenuProvider(object : MenuProvider {
+    private fun addButtonToActionBar(viewLifecycleOwner : LifecycleOwner) {
+        requireActivity().addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                // Add menu items here
                 menuInflater.inflate(R.menu.menu_favorite, menu)
             }
 
@@ -95,15 +73,30 @@ class RecipeFragment : Fragment() {
                 // Handle the menu selection
                 return when (menuItem.itemId) {
                     R.id.action_favorite -> {
-                        //code here
+                        mealData?.let{ meal ->
+                            addFavorite(meal)
+                            Common.onAddedToFavorites(requireContext())
+                        }
+                        true
+                    }
+                    R.id.action_share -> {
+                        val sharingIntent = Intent(Intent.ACTION_SEND)
+
+                        sharingIntent.type = "text/plain"
+                        val shareBody = "$recipeName\n\nI found this recipe on the app EatItUp!\nDownload it now on Google Play Store"
+                        val shareSubject = "EatItUp! recipe"
+
+                        sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody)
+                        sharingIntent.putExtra(Intent.EXTRA_SUBJECT, shareSubject)
+                        startActivity(Intent.createChooser(sharingIntent, "Share using"))
                         true
                     }
                     else -> false
                 }
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
-
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -82,7 +82,7 @@ class SearchFragment : Fragment() {
             appDAO.insertFavoriteMeal(meal)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe({ }, { t -> Common.onFailure(requireContext(), t) })
+                .subscribe({ Common.onAddedToFavorites(requireContext()) }, { t -> Common.onFailure(requireContext(), t) })
         )
     }
 

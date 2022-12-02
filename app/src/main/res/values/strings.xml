@@ -14,4 +14,5 @@
     <string name="randomizer_text">To get another random recipe, press the button above !</string>
     <string name="button_add_favorite">Add to favorite</string>
     <string name="your_favorite_meals_text">Your favorite meals</string>
+    <string name="action_bar_button">Action bar button</string>
 </resources>

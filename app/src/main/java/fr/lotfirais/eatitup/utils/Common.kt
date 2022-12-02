@@ -1,7 +1,15 @@
 package fr.lotfirais.eatitup.utils
 
 import android.content.Context
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.Toast
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import fr.lotfirais.eatitup.R
 import fr.lotfirais.eatitup.data.models.IngredientsHolder
 import fr.lotfirais.eatitup.data.models.Meal
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
@@ -13,6 +21,10 @@ object Common {
 
     fun onFailure(context: Context, t: Throwable) {
         Toast.makeText(context,t.message, Toast.LENGTH_SHORT).show()
+    }
+
+    fun onAddedToFavorites(context: Context) {
+        Toast.makeText(context, "Added recipe to favorites", Toast.LENGTH_SHORT).show()
     }
 
     /**
