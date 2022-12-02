@@ -28,7 +28,11 @@ class HomeFragment : Fragment() {
     private var searchText: String = ""
     private var randomMealId: String = ""
 
-    private var autocompleteData: MutableList<String> = mutableListOf<String>()
+    private val proposedChoices = 5;
+    private var autocompleteIngredientData: MutableList<String> = mutableListOf()
+    private var autocompleteMealsData: MutableList<String> = mutableListOf()
+    private lateinit var autocompleteMealsArrayAdapter : ArrayAdapter<String>
+    private lateinit var autocompleteIngredientsArrayAdapter : ArrayAdapter<String>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,38 +40,9 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentHomeBinding.inflate(inflater, container, false)
-        getAutocompleteData()
-        randomMealRequest()
 
-        binding.buttonByName.setOnClickListener {
-            searchMode = 0
-            binding.searchText.setAdapter(null)
-        }
-        binding.buttonByIngredient.setOnClickListener {
-            searchMode = 1
-            val autocompleteAdapter = AutocompleteArrayAdapter(5)
-            binding.searchText.setAdapter(autocompleteAdapter)
-        }
-
-        binding.searchText.doOnTextChanged { text, _, _, _ -> searchText = text.toString() }
-        binding.searchText.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
-            if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                binding.searchButton.performClick()
-                return@OnKeyListener true
-            }
-            false
-        })
-
-        binding.buttonTryRandomMeal.setOnClickListener {
-            findNavController().navigate(
-                HomeFragmentDirections.actionHomeFragmentToRecipeFragment(randomMealId)
-            )
-        }
-        binding.searchButton.setOnClickListener {
-            findNavController().navigate(
-                HomeFragmentDirections.actionHomeFragmentToSearchFragment(searchText, searchMode)
-            )
-        }
+        init()
+        initListener()
 
         return binding.root
     }
@@ -104,30 +79,103 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun getAutocompleteData() {
+    private fun init()
+    {
+        getAutocompleteIngredientsData()
+        randomMealRequest()
+        autocompleteMealsArrayAdapter = AutocompleteArrayAdapter(autocompleteMealsData)
+        autocompleteIngredientsArrayAdapter = AutocompleteArrayAdapter(autocompleteIngredientData)
+
+        binding.searchText.setAdapter(autocompleteMealsArrayAdapter)
+    }
+
+    private fun initListener()
+    {
+        binding.buttonByName.setOnClickListener {
+            searchMode = 0
+            binding.searchText.setAdapter(autocompleteMealsArrayAdapter)
+        }
+        binding.buttonByIngredient.setOnClickListener {
+            searchMode = 1
+            binding.searchText.setAdapter(autocompleteIngredientsArrayAdapter)
+        }
+
+        binding.searchText.doOnTextChanged {
+                text, _, _, _ ->
+
+            if(text.toString().isNotEmpty())
+            {
+                searchText = text.toString()
+                getAutocompleteMealsData(text.toString())
+            }
+
+        }
+        binding.searchText.setOnKeyListener(View.OnKeyListener { _, keyCode, _ ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                binding.searchButton.performClick()
+                return@OnKeyListener true
+            }
+            false
+        })
+
+        binding.buttonTryRandomMeal.setOnClickListener {
+            findNavController().navigate(
+                HomeFragmentDirections.actionHomeFragmentToRecipeFragment(randomMealId)
+            )
+        }
+        binding.searchButton.setOnClickListener {
+            findNavController().navigate(
+                HomeFragmentDirections.actionHomeFragmentToSearchFragment(searchText, searchMode)
+            )
+        }
+    }
+
+    private fun getAutocompleteIngredientsData() {
         compositeDisposable.add(
             ServiceBuilder.buildService()
                 .getAllIngredients()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(
-                    { response -> fillAutocompleteData(response) },
+                    { response -> fillAutocompleteIngredientsData(response) },
                     { t -> Common.onFailure(requireContext(), t) })
         )
     }
 
-    private fun fillAutocompleteData(response: Ingredients) {
+    private fun fillAutocompleteIngredientsData(response: Ingredients) {
         response.meals?.forEach {
             if (!it.strIngredient.isNullOrEmpty())
-                autocompleteData.add(it.strIngredient)
+                autocompleteIngredientData.add(it.strIngredient)
         }
     }
 
-    inner class AutocompleteArrayAdapter(private val proposedChoices: Int) : ArrayAdapter<String>(
+    private fun getAutocompleteMealsData( wholeWord: String) {
+        compositeDisposable.add(
+            ServiceBuilder.buildService()
+                .searchMealByName(wholeWord)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                    { response -> fillAutocompleteMealsData(response) },
+                    { t -> Common.onFailure(requireContext(), t) })
+        )
+    }
+
+    private fun fillAutocompleteMealsData(response: Meals) {
+        autocompleteMealsData.clear()
+        response.meals?.forEach {
+            if (!it.strMeal.isNullOrEmpty() )
+                autocompleteMealsData.add(it.strMeal)
+        }
+        binding.searchText.setAdapter( AutocompleteArrayAdapter(autocompleteMealsData))
+    }
+
+    inner class AutocompleteArrayAdapter(private val autocompleteData:MutableList<String>) : ArrayAdapter<String>(
         requireContext(),
         android.R.layout.simple_list_item_1,
         autocompleteData
-    ) {
+    )
+    {
         override fun getCount(): Int {
             if(super.getCount() > proposedChoices)
                 return proposedChoices
