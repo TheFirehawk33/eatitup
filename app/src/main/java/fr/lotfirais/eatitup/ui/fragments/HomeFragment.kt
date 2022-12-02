@@ -93,10 +93,12 @@ class HomeFragment : Fragment() {
     private fun initListener() {
         binding.buttonByName.setOnClickListener {
             searchMode = searchByNameId
+            binding.searchText.text.clear()
             binding.searchText.setAdapter(autocompleteMealsArrayAdapter)
         }
         binding.buttonByIngredient.setOnClickListener {
             searchMode = searchByIngredientId
+            binding.searchText.text.clear()
             binding.searchText.setAdapter(autocompleteIngredientsArrayAdapter)
         }
 
