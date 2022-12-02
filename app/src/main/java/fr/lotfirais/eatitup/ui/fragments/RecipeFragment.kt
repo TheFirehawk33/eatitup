@@ -3,9 +3,14 @@ package fr.lotfirais.eatitup.ui.fragments
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import android.view.*
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings.PluginState
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import fr.lotfirais.eatitup.R
 import fr.lotfirais.eatitup.data.db.AppDAO
 import fr.lotfirais.eatitup.data.models.Meal
 import fr.lotfirais.eatitup.data.models.Meals
@@ -71,6 +76,33 @@ class RecipeFragment : Fragment() {
         }
 
         return binding.root
+    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        // The usage of an interface lets you inject your own implementation
+        val menuHost: MenuHost = requireActivity()
+
+        // Add menu items without using the Fragment Menu APIs
+        // Note how we can tie the MenuProvider to the viewLifecycleOwner
+        // and an optional Lifecycle.State (here, RESUMED) to indicate when
+        // the menu should be visible
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                // Add menu items here
+                menuInflater.inflate(R.menu.menu_favorite, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                // Handle the menu selection
+                return when (menuItem.itemId) {
+                    R.id.action_favorite -> {
+                        //code here
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
     }
 
     override fun onDestroyView() {
