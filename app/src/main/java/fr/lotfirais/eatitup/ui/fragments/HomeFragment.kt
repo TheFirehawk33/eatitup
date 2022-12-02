@@ -30,7 +30,7 @@ class HomeFragment : Fragment() {
     private var searchText: String = ""
     private var randomMealId: String = ""
 
-    private val proposedChoices = 5;
+    private val proposedChoices = 5
     private var autocompleteIngredientData: MutableList<String> = mutableListOf()
     private var autocompleteMealsData: MutableList<String> = mutableListOf()
     private lateinit var autocompleteMealsArrayAdapter: ArrayAdapter<String>
@@ -136,7 +136,6 @@ class HomeFragment : Fragment() {
                 HomeFragmentDirections.actionHomeFragmentToSearchFragment(searchText, searchMode)
             )
         }
-
     }
 
     private fun getAutocompleteIngredientsData() {

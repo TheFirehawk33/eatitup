@@ -82,7 +82,7 @@ class RecipeFragment : Fragment() {
                 // Handle the menu selection
                 return when (menuItem.itemId) {
                     R.id.action_favorite -> {
-                        println("LA SALOPE DE TES MOR")
+                        //code here
                         true
                     }
                     else -> false
