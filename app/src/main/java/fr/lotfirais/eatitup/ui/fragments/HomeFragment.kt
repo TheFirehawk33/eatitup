@@ -74,6 +74,13 @@ class HomeFragment : Fragment() {
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        binding.buttonByName.performClick()
+        binding.searchText.text.clear()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
 
