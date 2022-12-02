@@ -1,14 +1,16 @@
 package fr.lotfirais.eatitup.ui.fragments
 
 import android.os.Bundle
-import android.view.KeyEvent
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.ArrayAdapter
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.fragment.findNavController
+import fr.lotfirais.eatitup.R
 import fr.lotfirais.eatitup.data.models.Ingredients
 import fr.lotfirais.eatitup.data.models.Meals
 import fr.lotfirais.eatitup.data.network.ServiceBuilder
@@ -45,8 +47,31 @@ class HomeFragment : Fragment() {
 
         init()
         initListener()
+        addButtonToActionBar(viewLifecycleOwner)
 
         return binding.root
+    }
+
+    private fun addButtonToActionBar(viewLifecycleOwner : LifecycleOwner) {
+        val menuHost: MenuHost = requireActivity()
+
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_navigate_to_favorite, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.navigate_favorite -> {
+                        findNavController().navigate(
+                            HomeFragmentDirections.actionHomeFragmentToFavoriteFragment()
+                        )
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     override fun onDestroyView() {

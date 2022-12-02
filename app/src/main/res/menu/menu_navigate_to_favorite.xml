@@ -4,7 +4,7 @@
     <!-- "Mark Favorite", should appear as action button if possible -->
     <item
         android:id="@+id/navigate_favorite"
-        android:icon="@drawable/ic_navigation_favorite"
+        android:icon="@drawable/rectangle_list_regular"
         android:title="@string/meal_thumbnail"
         app:showAsAction="always" />
 </menu>
