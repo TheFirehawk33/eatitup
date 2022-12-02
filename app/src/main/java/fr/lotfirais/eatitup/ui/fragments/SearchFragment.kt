@@ -12,7 +12,9 @@ import fr.lotfirais.eatitup.data.models.Meals
 import fr.lotfirais.eatitup.data.network.ServiceBuilder
 import fr.lotfirais.eatitup.databinding.FragmentSearchBinding
 import fr.lotfirais.eatitup.ui.adapters.ResultsAdapter
+import fr.lotfirais.eatitup.ui.adapters.ResultsAlternateAdapter
 import fr.lotfirais.eatitup.utils.Common
+import fr.lotfirais.eatitup.utils.SEARCH_BY_NAME_ID
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -20,11 +22,13 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 class SearchFragment : Fragment() {
     private lateinit var binding: FragmentSearchBinding
     private val compositeDisposable = CompositeDisposable()
+
     private var searchString: String? = ""
-    private var searchMode: Int? = 0
+    private var searchMode: Int? = SEARCH_BY_NAME_ID
+
     private var categoryList: MutableList<String> = mutableListOf()
     private var selectedCategory: String? = ""
-    private val allCategory: String = "all"
+    private val allCategory: String = "All"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,9 +48,11 @@ class SearchFragment : Fragment() {
         binding.recyclerViewMeals.adapter = ResultsAdapter(requireContext())
 
         searchString?.let {
-            if (searchMode == 0) {
+            if (searchMode == SEARCH_BY_NAME_ID) {
+                binding.recyclerViewMeals.adapter = ResultsAdapter(requireContext())
                 searchByNameRequest(it)
             } else {
+                binding.recyclerViewMeals.adapter = ResultsAlternateAdapter(requireContext())
                 searchByIngredientRequest(it)
             }
         }
@@ -85,11 +91,20 @@ class SearchFragment : Fragment() {
     }
 
     private fun onSearchResponse(response: Meals) {
-        binding.searchResultCount.text = String.format("No results found.")
-        response.meals?.let { meals ->
-            (binding.recyclerViewMeals.adapter as? ResultsAdapter)?.update(meals)
-            fillDataPostRequest(meals)
-            initCategoryFilter(meals)
+        if(searchMode == SEARCH_BY_NAME_ID) {
+            binding.searchResultCount.text = String.format("No results found.")
+            response.meals?.let { meals ->
+                (binding.recyclerViewMeals.adapter as? ResultsAdapter)?.update(meals)
+                fillDataPostRequest(meals)
+                initCategoryFilter(meals)
+            }
+        } else {
+            binding.searchResultCount.text = String.format("No results found.")
+            response.meals?.let { meals ->
+                (binding.recyclerViewMeals.adapter as? ResultsAlternateAdapter)?.update(meals)
+                fillDataPostRequest(meals)
+                initCategoryFilter(meals)
+            }
         }
     }
 
@@ -103,8 +118,6 @@ class SearchFragment : Fragment() {
     }
 
     private fun initCategoryFilter(meals: List<Meal>) {
-
-
         if (categoryList.isNotEmpty()) {
             categoryList.add(0, allCategory)
             binding.searchResultCategory.visibility = View.VISIBLE
@@ -112,9 +125,9 @@ class SearchFragment : Fragment() {
                 ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, categoryList)
             binding.searchResultCategory.onItemSelectedListener =
                 CategoryFilterItemSelectedListener(meals)
-
-        } else
+        } else {
             binding.searchResultCategory.visibility = View.GONE
+        }
     }
 
     inner class CategoryFilterItemSelectedListener constructor(private val meals: List<Meal>) :

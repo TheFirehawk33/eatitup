@@ -15,6 +15,8 @@ import fr.lotfirais.eatitup.data.network.ServiceBuilder
 import fr.lotfirais.eatitup.databinding.FragmentHomeBinding
 import fr.lotfirais.eatitup.utils.Common
 import fr.lotfirais.eatitup.utils.ImageDisplay
+import fr.lotfirais.eatitup.utils.SEARCH_BY_INGREDIENTS_ID
+import fr.lotfirais.eatitup.utils.SEARCH_BY_NAME_ID
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -24,15 +26,15 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private val compositeDisposable = CompositeDisposable()
 
-    private var searchMode : Int = 0
-    private var searchText : String = ""
-    private var randomMealId : String = ""
+    private var searchMode: Int = 0
+    private var searchText: String = ""
+    private var randomMealId: String = ""
 
     private val proposedChoices = 5;
     private var autocompleteIngredientData: MutableList<String> = mutableListOf()
     private var autocompleteMealsData: MutableList<String> = mutableListOf()
-    private lateinit var autocompleteMealsArrayAdapter : ArrayAdapter<String>
-    private lateinit var autocompleteIngredientsArrayAdapter : ArrayAdapter<String>
+    private lateinit var autocompleteMealsArrayAdapter: ArrayAdapter<String>
+    private lateinit var autocompleteIngredientsArrayAdapter: ArrayAdapter<String>
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -79,8 +81,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun init()
-    {
+    private fun init() {
         getAutocompleteIngredientsData()
         randomMealRequest()
         autocompleteMealsArrayAdapter = AutocompleteArrayAdapter(autocompleteMealsData)
@@ -89,22 +90,21 @@ class HomeFragment : Fragment() {
         binding.searchText.setAdapter(autocompleteMealsArrayAdapter)
     }
 
-    private fun initListener()
-    {
+    private fun initListener() {
         binding.buttonByName.setOnClickListener {
-            searchMode = 0
+            searchMode = SEARCH_BY_NAME_ID
+            binding.searchText.text.clear()
             binding.searchText.setAdapter(autocompleteMealsArrayAdapter)
         }
         binding.buttonByIngredient.setOnClickListener {
-            searchMode = 1
+            searchMode = SEARCH_BY_INGREDIENTS_ID
+            binding.searchText.text.clear()
             binding.searchText.setAdapter(autocompleteIngredientsArrayAdapter)
         }
 
-        binding.searchText.doOnTextChanged {
-                text, _, _, _ ->
+        binding.searchText.doOnTextChanged { text, _, _, _ ->
 
-            if(text.toString().isNotEmpty())
-            {
+            if (text.toString().isNotEmpty() && searchMode == SEARCH_BY_NAME_ID) {
                 searchText = text.toString()
                 getAutocompleteMealsData(text.toString())
             }
@@ -118,10 +118,10 @@ class HomeFragment : Fragment() {
             false
         })
 
-        binding.buttonRandomizer.setOnClickListener{
+        binding.buttonRandomizer.setOnClickListener {
             randomMealRequest()
         }
-        binding.randomMealImage.setOnClickListener{
+        binding.randomMealImage.setOnClickListener {
             findNavController().navigate(
                 HomeFragmentDirections.actionHomeFragmentToRecipeFragment(randomMealId)
             )
@@ -157,7 +157,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun getAutocompleteMealsData( wholeWord: String) {
+    private fun getAutocompleteMealsData(wholeWord: String) {
         compositeDisposable.add(
             ServiceBuilder.buildService()
                 .searchMealByName(wholeWord)
@@ -172,20 +172,20 @@ class HomeFragment : Fragment() {
     private fun fillAutocompleteMealsData(response: Meals) {
         autocompleteMealsData.clear()
         response.meals?.forEach {
-            if (!it.strMeal.isNullOrEmpty() )
+            if (!it.strMeal.isNullOrEmpty())
                 autocompleteMealsData.add(it.strMeal)
         }
-        binding.searchText.setAdapter( AutocompleteArrayAdapter(autocompleteMealsData))
+        binding.searchText.setAdapter(AutocompleteArrayAdapter(autocompleteMealsData))
     }
 
-    inner class AutocompleteArrayAdapter(private val autocompleteData:MutableList<String>) : ArrayAdapter<String>(
-        requireContext(),
-        android.R.layout.simple_list_item_1,
-        autocompleteData
-    )
-    {
+    inner class AutocompleteArrayAdapter(private val autocompleteData: MutableList<String>) :
+        ArrayAdapter<String>(
+            requireContext(),
+            android.R.layout.simple_list_item_1,
+            autocompleteData
+        ) {
         override fun getCount(): Int {
-            if(super.getCount() > proposedChoices)
+            if (super.getCount() > proposedChoices)
                 return proposedChoices
             return super.getCount()
         }
