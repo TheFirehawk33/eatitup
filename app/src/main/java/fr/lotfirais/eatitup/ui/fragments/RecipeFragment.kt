@@ -1,9 +1,10 @@
 package fr.lotfirais.eatitup.ui.fragments
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings.PluginState
 import androidx.fragment.app.Fragment
 import fr.lotfirais.eatitup.data.models.Meals
 import fr.lotfirais.eatitup.data.network.ServiceBuilder
@@ -15,12 +16,14 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 
+
 class RecipeFragment : Fragment() {
 
     private lateinit var binding: FragmentRecipeBinding
     private val compositeDisposable = CompositeDisposable()
 
     private var recipeId: String? = ""
+    private var recipeName: String? = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,8 +39,19 @@ class RecipeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentRecipeBinding.inflate(inflater, container, false)
-
         binding.recyclerViewIngredients.adapter = IngredientsAdapter(requireContext())
+
+        binding.shareButton.setOnClickListener{
+            val sharingIntent = Intent(Intent.ACTION_SEND)
+
+            sharingIntent.type = "text/plain"
+            val shareBody = "$recipeName\n\nI found this recipe on the app EatItUp!\nDownload it now on Google Play Store"
+            val shareSubject = "EatItUp! recipe"
+
+            sharingIntent.putExtra(Intent.EXTRA_TEXT, shareBody)
+            sharingIntent.putExtra(Intent.EXTRA_SUBJECT, shareSubject)
+            startActivity(Intent.createChooser(sharingIntent, "Share using"))
+        }
 
         recipeId?.let{
             mealRequest(it)
@@ -65,6 +79,8 @@ class RecipeFragment : Fragment() {
         response.meals?.first()?.let { meal ->
             (binding.recyclerViewIngredients.adapter as? IngredientsAdapter)?.update(meal)
             binding.recipeName.text = meal.strMeal
+            recipeName = meal.strMeal
+            binding.categoryName.text = meal.strCategory
             binding.recipeInstructions.text = meal.strInstructions?.replace("\r","\n")
             meal.strMealThumb?.let{ thumb ->
                 ImageDisplay.loadImageViaUrl(requireContext(),binding.recipeThumb, thumb, ImageDisplay.recipeImageOptions)

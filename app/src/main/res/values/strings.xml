@@ -9,4 +9,5 @@
     <string name="meal_thumbnail">Meal thumbnail</string>
     <string name="ingredientsTitle">Ingredients</string>
     <string name="instructionsTitle">Steps</string>
+    <string name="share_button">Share</string>
 </resources>
